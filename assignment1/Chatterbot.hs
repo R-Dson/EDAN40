@@ -1,7 +1,9 @@
 module Chatterbot where
 import Utilities
-import System.Random
+--import System.Random
 import Data.Char
+import Data.Text (splitOn)
+import Distribution.ModuleName (main)
 
 chatterbot :: String -> [(String, [String])] -> IO ()
 chatterbot botName botRules = do
@@ -66,7 +68,7 @@ present :: Phrase -> String
 present = unwords
 
 prepare :: String -> Phrase
-prepare = reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|") 
+prepare = reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|")
 
 rulesCompile :: [(String, [String])] -> BotBrain
 {- TO BE WRITTEN -}
@@ -105,15 +107,18 @@ reductionsApply _ = id
 
 -- Replaces a wildcard in a list with the list given as the third argument
 substitute :: Eq a => a -> [a] -> [a] -> [a]
-substitute _ _ _ = []
 {- TO BE WRITTEN -}
-
+substitute _ [] _ = []
+substitute a (x:xs) ys
+  | a == x = ys ++ substitute a xs ys
+  | otherwise = x : substitute a xs ys
 
 -- Tries to match two lists. If they match, the result consists of the sublist
 -- bound to the wildcard in the pattern list.
 match :: Eq a => a -> [a] -> [a] -> Maybe [a]
 match _ _ _ = Nothing
 {- TO BE WRITTEN -}
+match wildcard p s = Nothing 
 
 
 -- Helper function to match
@@ -137,7 +142,7 @@ substituteCheck = substituteTest == testString
 matchTest = match '*' testPattern testString
 matchCheck = matchTest == Just testSubstitutions
 
-
+main = print (substituteCheck)
 
 -------------------------------------------------------
 -- Applying patterns
