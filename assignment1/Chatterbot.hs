@@ -1,9 +1,9 @@
 module Chatterbot where
 import Utilities
-import System.Random
+--import System.Random
 import Data.Char
 import Data.Text (splitOn)
-import Distribution.ModuleName (main)
+--import Distribution.ModuleName (main)
 
 
 chatterbot :: String -> [(String, [String])] -> IO ()
@@ -123,7 +123,7 @@ match _ [] _ = Nothing
 match _ _ [] = Nothing
 {- TO BE WRITTEN -}
 -- TODO
-match wildcard p s = Just []
+match wildcard p s = Just [ if pi /= si && wildcard == pi then si else wildcard | pi <- p, si <- s]
 
 
 occurrences :: (Num a1, Eq a2) => a2 -> [a2] -> a1
@@ -131,7 +131,11 @@ occurrences w xs = sum [ if w == x then 1 else 0 | x <- xs]
 
 -- Helper function to match
 singleWildcardMatch, longerWildcardMatch :: Eq a => [a] -> [a] -> Maybe [a]
-singleWildcardMatch (wc:ps) (x:xs) = Nothing
+singleWildcardMatch _ [] = Just []
+singleWildcardMatch [] _ = Just []
+singleWildcardMatch (wc:ps) (x:xs)
+    | wc /= x = Just [x]
+    | otherwise = singleWildcardMatch ps xs
 {- TO BE WRITTEN -}
 longerWildcardMatch (wc:ps) (x:xs) = Nothing
 {- TO BE WRITTEN -}
