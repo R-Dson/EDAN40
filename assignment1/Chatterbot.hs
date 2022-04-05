@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Chatterbot where
 import Utilities
 --import System.Random
@@ -120,25 +121,37 @@ match :: Eq a => a -> [a] -> [a] -> Maybe [a]
 -- match _ _ _ = Nothing
 match _ [] [] = Just []
 match _ [] _ = Nothing
-match _ _ [] = Nothing
+match _ _ [] = Nothing 
 {- TO BE WRITTEN -}
--- TODO
-match wildcard p s = Just [ if pi /= si && wildcard == pi then si else wildcard | pi <- p, si <- s]
-
-
-occurrences :: (Num a1, Eq a2) => a2 -> [a2] -> a1
-occurrences w xs = sum [ if w == x then 1 else 0 | x <- xs]
+match wildcard p s
+  -- if they're equal, continue searching
+  | pi == si = match wildcard (tail p) (tail s)
+  -- if we reach the wildcard. We only look for the first value recursively, 
+  -- thus orElse throws away the second value
+  | pi == wildcard = orElse (singleWildcardMatch p s) $ longerWildcardMatch p s
+  | otherwise = Nothing 
+  where
+    pi = head p
+    si = head s
 
 -- Helper function to match
 singleWildcardMatch, longerWildcardMatch :: Eq a => [a] -> [a] -> Maybe [a]
-singleWildcardMatch _ [] = Just []
-singleWildcardMatch [] _ = Just []
-singleWildcardMatch (wc:ps) (x:xs)
-    | wc /= x = Just [x]
-    | otherwise = singleWildcardMatch ps xs
 {- TO BE WRITTEN -}
-longerWildcardMatch (wc:ps) (x:xs) = Nothing
+-- we know that x is the answer as the first correct element since 
+-- match call this when pi == wildcard. This will always return 
+-- Just [x], or nothing of course if there is no matches
+singleWildcardMatch (wc:ps) (x:xs) = 
+  mmap (const [x]) $ match wc ps xs
+
 {- TO BE WRITTEN -}
+-- appends the correct x (using (x:)) and then continues looking for new
+-- values AFTER x that are not equal to the elements in wc:ps
+-- for example, "a=*;" "a=32;", first we get x = 3, then we continue
+-- looking but in the match loop pi == si will not be equal but pi == wildcard
+-- will be equal so that means now 2 will also be appended, thus we have 32. 
+-- next iteration will reach the ; and result in pi == si being true finaly reaching Nothing
+longerWildcardMatch (wc:ps) (x:xs) = 
+  mmap (x:) $ match wc (wc:ps) xs
 
 
 -- findInd '*' "a=*;" $ reverse $ findInd '*' "a=*;" "a=32;"
@@ -153,8 +166,6 @@ substituteCheck = substituteTest == testString
 
 matchTest = match '*' testPattern testString
 matchCheck = matchTest == Just testSubstitutions
-
-main = print (substituteCheck)
 
 -------------------------------------------------------
 -- Applying patterns
