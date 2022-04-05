@@ -1,9 +1,10 @@
 module Chatterbot where
 import Utilities
---import System.Random
+import System.Random
 import Data.Char
 import Data.Text (splitOn)
 import Distribution.ModuleName (main)
+
 
 chatterbot :: String -> [(String, [String])] -> IO ()
 chatterbot botName botRules = do
@@ -116,10 +117,17 @@ substitute a (x:xs) ys
 -- Tries to match two lists. If they match, the result consists of the sublist
 -- bound to the wildcard in the pattern list.
 match :: Eq a => a -> [a] -> [a] -> Maybe [a]
-match _ _ _ = Nothing
+-- match _ _ _ = Nothing
+match _ [] [] = Just []
+match _ [] _ = Nothing
+match _ _ [] = Nothing
 {- TO BE WRITTEN -}
-match wildcard p s = Nothing 
+-- TODO
+match wildcard p s = Just []
 
+
+occurrences :: (Num a1, Eq a2) => a2 -> [a2] -> a1
+occurrences w xs = sum [ if w == x then 1 else 0 | x <- xs]
 
 -- Helper function to match
 singleWildcardMatch, longerWildcardMatch :: Eq a => [a] -> [a] -> Maybe [a]
@@ -129,7 +137,7 @@ longerWildcardMatch (wc:ps) (x:xs) = Nothing
 {- TO BE WRITTEN -}
 
 
-
+-- findInd '*' "a=*;" $ reverse $ findInd '*' "a=*;" "a=32;"
 -- Test cases --------------------
 
 testPattern =  "a=*;"
