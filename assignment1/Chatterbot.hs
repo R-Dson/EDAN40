@@ -143,7 +143,7 @@ singleWildcardMatch, longerWildcardMatch :: Eq a => [a] -> [a] -> Maybe [a]
 --singleWildcardMatch (wc:ps) (x:xs) =
   --mmap (const [x]) $ match wc ps xs
 -- this was given in lecture 6 slide 28
-singleWildcardMatch (wc:ps) (x:xs) = match wc ps xs >> Just []
+singleWildcardMatch (wc:ps) (x:xs) = match wc ps xs >> Just [x]
 
 
 {- TO BE WRITTEN -}
