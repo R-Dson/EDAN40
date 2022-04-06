@@ -140,8 +140,11 @@ singleWildcardMatch, longerWildcardMatch :: Eq a => [a] -> [a] -> Maybe [a]
 -- we know that x is the answer as the first correct element since 
 -- match call this when pi == wildcard. This will always return 
 -- Just [x], or nothing of course if there is no matches
-singleWildcardMatch (wc:ps) (x:xs) = 
-  mmap (const [x]) $ match wc ps xs
+--singleWildcardMatch (wc:ps) (x:xs) =
+  --mmap (const [x]) $ match wc ps xs
+-- this was given in lecture 6 slide 28
+singleWildcardMatch (wc:ps) (x:xs) = match wc ps xs >> Just []
+
 
 {- TO BE WRITTEN -}
 -- appends the correct x (using (x:)) and then continues looking for new
