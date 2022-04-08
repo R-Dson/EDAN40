@@ -4,6 +4,7 @@ import Utilities
 --import System.Random
 import Data.Char
 import Data.Text (splitOn)
+import Distribution.Simple.Program.HcPkg (list)
 --import Distribution.ModuleName (main)
 
 
@@ -121,7 +122,7 @@ match :: Eq a => a -> [a] -> [a] -> Maybe [a]
 -- match _ _ _ = Nothing
 match _ [] [] = Just []
 match _ [] _ = Nothing
-match _ _ [] = Nothing 
+match _ _ [] = Nothing
 {- TO BE WRITTEN -}
 match wildcard p s
   -- if they're equal, continue searching
@@ -129,7 +130,7 @@ match wildcard p s
   -- if we reach the wildcard. We only look for the first value recursively, 
   -- thus orElse throws away the second value
   | pi == wildcard = orElse (singleWildcardMatch p s) $ longerWildcardMatch p s
-  | otherwise = Nothing 
+  | otherwise = Nothing
   where
     pi = head p
     si = head s
@@ -153,7 +154,7 @@ singleWildcardMatch (wc:ps) (x:xs) = match wc ps xs >> Just [x]
 -- looking but in the match loop pi == si will not be equal but pi == wildcard
 -- will be equal so that means now 2 will also be appended, thus we have 32. 
 -- next iteration will reach the ; and result in pi == si being true finaly reaching Nothing
-longerWildcardMatch (wc:ps) (x:xs) = 
+longerWildcardMatch (wc:ps) (x:xs) =
   mmap (x:) $ match wc (wc:ps) xs
 
 
@@ -177,18 +178,30 @@ matchCheck = matchTest == Just testSubstitutions
 -- Applying a single pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) -> Maybe [a]
 {- TO BE WRITTEN -}
-transformationApply _ _ _ (_, []) = Nothing 
-transformationApply _ _ _ ([], _) = Nothing 
-transformationApply _ _ [] _ = Nothing 
-transformationApply b f xs (ys, zs) = 
+transformationApply _ _ _ (_, []) = Nothing
+transformationApply _ _ _ ([], _) = Nothing
+transformationApply _ _ [] _ = Nothing
+transformationApply b f xs (ys, zs) =
   case rep of
     Just c -> Just $ substitute b zs c
-    Nothing -> Nothing 
+    Nothing -> Nothing
   where rep = match b ys xs
 
 -- Applying a list of patterns until one succeeds
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
-transformationsApply _ _ _ _ = Nothing
 {- TO BE WRITTEN -}
+transformationsApply b f list xs
+  | length fullList > 0 = Just $ concat fullList
+  | otherwise = Nothing
+  where fullList = [
+          let l = transformationApply b f xs x
+          in case l of 
+            Just c -> c | x <- list ]
 
-
+{- 
+helpFunc b f [] x = []
+helpFunc b f (c:xs) x =
+  case l of
+    Just a -> head a:helpFunc b f xs x
+    Nothing -> []:helpFunc b f xs x
+  where l = concatMap (a -> [b]) (t a) transformationApply b f (c:xs) x-}
