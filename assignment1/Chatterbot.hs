@@ -176,9 +176,15 @@ matchCheck = matchTest == Just testSubstitutions
 
 -- Applying a single pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) -> Maybe [a]
-transformationApply _ _ _ _ = Nothing
 {- TO BE WRITTEN -}
-
+transformationApply _ _ _ (_, []) = Nothing 
+transformationApply _ _ _ ([], _) = Nothing 
+transformationApply _ _ [] _ = Nothing 
+transformationApply b f xs (ys, zs) = 
+  case rep of
+    Just c -> Just $ substitute b zs c
+    Nothing -> Nothing 
+  where rep = match b ys xs
 
 -- Applying a list of patterns until one succeeds
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
