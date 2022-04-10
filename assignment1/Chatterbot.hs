@@ -1,4 +1,6 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Replace case with fromMaybe" #-}
 module Chatterbot where
 import Utilities
 --import System.Random
@@ -35,12 +37,40 @@ stateOfMind :: BotBrain -> IO (Phrase -> Phrase)
 stateOfMind _ = return id
 
 rulesApply :: [PhrasePair] -> Phrase -> Phrase
-{- TO BE WRITTEN -}
-rulesApply _ = id
+{- TO BE WRITTEN 
+rulesApply phrasepair phrase = 
+  let l = transformationsApply "*" phrase phrasepair
+  in case l of 
+    Just a -> a
+    Nothing -> phrase-}
+-- try (transformationsApply "*" phrase phrasepair)
+--try . transformationsApply "*" phrasepair phrase
+rulesApply phrasepair phrase = try (\i -> transformationsApply "*" id phrasepair i) phrase --concat [let l = transformationsApply "*" id phrasepair x 
+                                --in try l (Just []) --case l of 
+                                  --Just a -> a
+                                  --Nothing -> [] 
+                                  -- | x <- phrase]
+{-rulesApply phrasepair phrase = head [
+                                let list = head $ match "*" [x] (fst y) 
+                                in 
+                                  case list of 
+                                    Just a -> concat $ substitute "*" (snd y) a 
+                                    Nothing -> x | x <- phrase, y <- phrasepair]-}
+
+--"please help me" -> phrasepair -> första delen -> match första delen med INPUT -> 
+  --"please *" -> "help me" -> phrasepair -> andra delen -> "*" -> "help me"
+
+
+-- rulesApply phrasepair phrase = [ | x <- phrase ]
+
 
 reflect :: Phrase -> Phrase
 {- TO BE WRITTEN -}
-reflect = id
+reflect phrase = [ let l = lookup x reflections
+                    in case l of 
+                      Nothing -> x
+                      Just a -> concat $ substitute x [x] [a] 
+                      | x <- phrase ]
 
 reflections =
   [ ("am",     "are"),
@@ -178,25 +208,35 @@ matchCheck = matchTest == Just testSubstitutions
 -- Applying a single pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) -> Maybe [a]
 {- TO BE WRITTEN -}
-transformationApply _ _ _ (_, []) = Nothing
-transformationApply _ _ _ ([], _) = Nothing
-transformationApply _ _ [] _ = Nothing
-transformationApply b f xs (ys, zs) =
-  case rep of
+transformationApply _ _ [] _ = Nothing 
+transformationApply _ _ _ ([],_) = Nothing 
+transformationApply _ _ _ (_,[]) = Nothing 
+transformationApply b f xs (ys, zs) = mmap (substitute b zs) (match b ys xs)
+  {-case rep of
     Just c -> Just $ substitute b zs c
     Nothing -> Nothing
-  where rep = match b ys xs
+  where rep = match b ys xs-}
 
 -- Applying a list of patterns until one succeeds
 transformationsApply :: Eq a => a -> ([a] -> [a]) -> [([a], [a])] -> [a] -> Maybe [a]
-{- TO BE WRITTEN -}
-transformationsApply b f list xs
-  | length fullList > 0 = Just $ concat fullList
+{- TO BE WRITTEN
+transformationsApply b f pair xs
+  | length fullList > 0 = Just fullList
   | otherwise = Nothing
-  where fullList = [
+  where fullList = concat [ 
           let l = transformationApply b f xs x
           in case l of 
-            Just c -> c | x <- list ]
+            Just c -> c
+            Nothing -> [] | x <- pair ] -}
+transformationsApply _ _ [] _ = Nothing 
+transformationsApply b f (p:pairs) xs = orElse (transformationApply b f xs p) (transformationsApply b f pairs xs)
+  --in case l of 
+    --Just a -> Just a
+    --Nothing -> transformationsApply b f pairs xs
+
+-- filters nothing values
+helpfunc :: [Maybe a] -> [a]
+helpfunc ls = [x | Just x <- ls ]
 
 {- 
 helpFunc b f [] x = []
