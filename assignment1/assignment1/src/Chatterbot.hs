@@ -1,13 +1,7 @@
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Replace case with fromMaybe" #-}
 module Chatterbot where
 import Utilities
---import System.Random
+import System.Random
 import Data.Char
-import Data.Text (splitOn)
-import Distribution.Simple.Program.HcPkg (list)
---import Distribution.ModuleName (main)
 
 
 chatterbot :: String -> [(String, [String])] -> IO ()
@@ -34,7 +28,11 @@ type BotBrain = [(Phrase, [Phrase])]
 
 stateOfMind :: BotBrain -> IO (Phrase -> Phrase)
 {- TO BE WRITTEN -}
-stateOfMind _ = return id
+stateOfMind brain = 
+  do
+    r <- randomIO :: IO Float;
+    print brain
+    return id;
 
 rulesApply :: [PhrasePair] -> Phrase -> Phrase
 {- TO BE WRITTEN 
@@ -45,7 +43,12 @@ rulesApply phrasepair phrase =
     Nothing -> phrase-}
 -- try (transformationsApply "*" phrase phrasepair)
 --try . transformationsApply "*" phrasepair phrase
-rulesApply phrasepair phrase = try (\i -> transformationsApply "*" id phrasepair i) phrase --concat [let l = transformationsApply "*" id phrasepair x 
+rulesApply phrasepair phrase =
+  case word of
+    Nothing -> words ""
+    Just a -> a
+  where word = (\i -> transformationsApply "*" id phrasepair i) (reflect phrase)
+--concat [let l = transformationsApply "*" id phrasepair x 
                                 --in try l (Just []) --case l of 
                                   --Just a -> a
                                   --Nothing -> [] 
@@ -228,15 +231,11 @@ transformationsApply b f pair xs
           in case l of 
             Just c -> c
             Nothing -> [] | x <- pair ] -}
-transformationsApply _ _ [] _ = Nothing 
+transformationsApply _ _ [] _ = Nothing
 transformationsApply b f (p:pairs) xs = orElse (transformationApply b f xs p) (transformationsApply b f pairs xs)
   --in case l of 
     --Just a -> Just a
     --Nothing -> transformationsApply b f pairs xs
-
--- filters nothing values
-helpfunc :: [Maybe a] -> [a]
-helpfunc ls = [x | Just x <- ls ]
 
 {- 
 helpFunc b f [] x = []
