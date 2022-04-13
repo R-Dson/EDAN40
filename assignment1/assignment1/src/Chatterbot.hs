@@ -28,11 +28,11 @@ type BotBrain = [(Phrase, [Phrase])]
 
 stateOfMind :: BotBrain -> IO (Phrase -> Phrase)
 {- TO BE WRITTEN -}
-stateOfMind brain = 
+stateOfMind brain =
   do
     r <- randomIO :: IO Float;
-    print brain
-    return id;
+    let list = [ (fst x, pick r (snd x)) | x <- brain ]
+    return $ rulesApply list 
 
 rulesApply :: [PhrasePair] -> Phrase -> Phrase
 {- TO BE WRITTEN 
@@ -70,9 +70,9 @@ rulesApply phrasepair phrase =
 reflect :: Phrase -> Phrase
 {- TO BE WRITTEN -}
 reflect phrase = [ let l = lookup x reflections
-                    in case l of 
+                    in case l of
                       Nothing -> x
-                      Just a -> concat $ substitute x [x] [a] 
+                      Just a -> concat $ substitute x [x] [a]
                       | x <- phrase ]
 
 reflections =
@@ -211,9 +211,9 @@ matchCheck = matchTest == Just testSubstitutions
 -- Applying a single pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) -> Maybe [a]
 {- TO BE WRITTEN -}
-transformationApply _ _ [] _ = Nothing 
-transformationApply _ _ _ ([],_) = Nothing 
-transformationApply _ _ _ (_,[]) = Nothing 
+transformationApply _ _ [] _ = Nothing
+transformationApply _ _ _ ([],_) = Nothing
+transformationApply _ _ _ (_,[]) = Nothing
 transformationApply b f xs (ys, zs) = mmap (substitute b zs) (match b ys xs)
   {-case rep of
     Just c -> Just $ substitute b zs c
