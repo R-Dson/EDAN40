@@ -108,8 +108,12 @@ prepare = reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|")
 
 rulesCompile :: [(String, [String])] -> BotBrain
 {- TO BE WRITTEN -}
-rulesCompile _ = []
-
+-- botbrain is structured as [(Phrase, [Phrase])]
+-- foreach element in input we create a pair where we use "map2" to apply "words . map toLower" to the first 
+-- element of the input pair to making it a Phrase and lowercase. The second element of the pair becomes 
+-- "map words (snd x)" which is a list of answers the robot can reply.
+--rulesCompile xs = map (map2 (words . map toLower, map words)) xs
+rulesCompile xs = [(words (map toLower (fst x)), map words (snd x)) | x <- xs]
 
 --------------------------------------
 
