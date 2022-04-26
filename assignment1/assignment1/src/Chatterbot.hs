@@ -138,7 +138,10 @@ reduce = reductionsApply reductions
 
 reductionsApply :: [PhrasePair] -> Phrase -> Phrase
 {- TO BE WRITTEN -}
-reductionsApply _ = id
+-- Using the function 'transformationsApply' we wrote earlier. Applies the function using fix for the values in xs and p.
+reductionsApply xs p = fix (\i -> case (transformationsApply "*" id xs i) of
+                                  Nothing -> i
+                                  Just a -> a) p
 
 
 -------------------------------------------------------
