@@ -1,13 +1,13 @@
 module Chatterbot where
-import Utilities
-import System.Random
-import Data.Char
 
+import Data.Char
+import System.Random
+import Utilities
 
 chatterbot :: String -> [(String, [String])] -> IO ()
 chatterbot botName botRules = do
-    putStrLn ("\n\nHi! I am " ++ botName ++ ". How are you?")
-    botloop
+  putStrLn ("\n\nHi! I am " ++ botName ++ ". How are you?")
+  botloop
   where
     brain = rulesCompile botRules
     botloop = do
@@ -23,31 +23,32 @@ type Phrase = [String]
 type PhrasePair = (Phrase, Phrase)
 type BotBrain = [(Phrase, [Phrase])]
 
-
 --------------------------------------------------------
 
 stateOfMind :: BotBrain -> IO (Phrase -> Phrase)
 stateOfMind brain =
   do
-    r <- randomIO :: IO Float;
-    let list = [ (fst x, pick r (snd x)) | x <- brain ]
-    return $ rulesApply list 
+    r <- randomIO :: IO Float
+    let list = [(fst x, pick r (snd x)) | x <- brain]
+    return $ rulesApply list
 
 rulesApply :: [PhrasePair] -> Phrase -> Phrase
 rulesApply phrasepair phrase =
   case word of
     Nothing -> words ""
     Just a -> a
-  where word = (\i -> transformationsApply "*" id phrasepair i) (reflect phrase)
+  where
+    word = (\i -> transformationsApply "*" id phrasepair i) (reflect phrase)
 
---"please help me" -> phrasepair -> första delen -> match första delen med INPUT -> 
+--"please help me" -> phrasepair -> första delen -> match första delen med INPUT ->
 --"please *" -> "help me" -> phrasepair -> andra delen -> "*" -> "help me"
 reflect :: Phrase -> Phrase
-reflect phrase = [ let l = lookup x reflections
-                    in case l of
-                      Nothing -> x
-                      Just a -> concat $ substitute x [x] [a]
-                      | x <- phrase ]
+reflect phrase =
+  [ let l = lookup x reflections
+     in case l of
+          Nothing -> x
+          Just a -> concat $ substitute x [x] [a]
+    | x <- phrase]
 
 reflections =
   [ ("am",     "are"),
@@ -68,11 +69,10 @@ reflections =
     ("you",    "me")
   ]
 
-
 ---------------------------------------------------------------------------------
 
 endOfDialog :: String -> Bool
-endOfDialog = (=="quit") . map toLower
+endOfDialog = (== "quit") . map toLower
 
 present :: Phrase -> String
 present = unwords
@@ -82,13 +82,12 @@ prepare = reduce . words . map toLower . filter (not . flip elem ".,:;*!#%&|")
 
 rulesCompile :: [(String, [String])] -> BotBrain
 -- botbrain is structured as [(Phrase, [Phrase])]
--- foreach element in input we create a pair where we use "map2" to apply "words . map toLower" to the first 
--- element of the input pair to making it a Phrase and lowercase. The second element of the pair becomes 
+-- foreach element in input we create a pair where we use "map2" to apply "words . map toLower" to the first
+-- element of the input pair to making it a Phrase and lowercase. The second element of the pair becomes
 -- "map words (snd x)" which is a list of answers the robot can reply.
 rulesCompile xs = [(words (map toLower (fst x)), map words (snd x)) | x <- xs]
 
 --------------------------------------
-
 
 reductions :: [PhrasePair]
 reductions = (map.map2) (words, words)
@@ -110,10 +109,10 @@ reduce = reductionsApply reductions
 
 -- Using the function 'transformationsApply' we wrote earlier. Applies the function using fix for the values in xs and p.
 reductionsApply :: [PhrasePair] -> Phrase -> Phrase
-reductionsApply xs p = fix (\i -> case (transformationsApply "*" id xs i) of
-                                  Nothing -> i
-                                  Just a -> a) p
-
+reductionsApply xs p =
+  fix ( \i -> case (transformationsApply "*" id xs i) of
+        Nothing -> i
+        Just a -> a ) p
 
 -------------------------------------------------------
 -- Match and substitute
@@ -122,7 +121,7 @@ reductionsApply xs p = fix (\i -> case (transformationsApply "*" id xs i) of
 -- Replaces a wildcard in a list with the list given as the third argument
 substitute :: Eq a => a -> [a] -> [a] -> [a]
 substitute _ [] _ = []
-substitute a (x:xs) ys
+substitute a (x : xs) ys
   | a == x = ys ++ substitute a xs ys
   | otherwise = x : substitute a xs ys
 
@@ -135,7 +134,7 @@ match _ _ [] = Nothing
 match wildcard p s
   -- if they're equal, continue searching
   | pi == si = match wildcard (tail p) (tail s)
-  -- if we reach the wildcard. We only look for the first value recursively, 
+  -- if we reach the wildcard. We only look for the first value recursively,
   -- thus orElse throws away the second value
   | pi == wildcard = orElse (singleWildcardMatch p s) $ longerWildcardMatch p s
   | otherwise = Nothing
@@ -145,11 +144,11 @@ match wildcard p s
 
 -- Helper function to match
 singleWildcardMatch, longerWildcardMatch :: Eq a => [a] -> [a] -> Maybe [a]
--- we know that x is the answer as the first correct element since 
--- match call this when pi == wildcard. This will always return 
+-- we know that x is the answer as the first correct element since
+-- match call this when pi == wildcard. This will always return
 -- Just [x], or nothing of course if there is no matches
 --singleWildcardMatch (wc:ps) (x:xs) =
-  --mmap (const [x]) $ match wc ps xs
+--mmap (const [x]) $ match wc ps xs
 -- this was given in lecture 6 slide 28
 singleWildcardMatch (wc:ps) (x:xs) = match wc ps xs >> Just [x]
 
@@ -166,7 +165,8 @@ longerWildcardMatch (wc:ps) (x:xs) = mmap (x:) $ match wc (wc:ps) xs
 -- findInd '*' "a=*;" $ reverse $ findInd '*' "a=*;" "a=32;"
 -- Test cases --------------------
 
-testPattern =  "a=*;"
+testPattern = "a=*;"
+
 testSubstitutions = "32"
 testString = "a=32;"
 
@@ -183,8 +183,8 @@ matchCheck = matchTest == Just testSubstitutions
 -- Applying a single pattern
 transformationApply :: Eq a => a -> ([a] -> [a]) -> [a] -> ([a], [a]) -> Maybe [a]
 transformationApply _ _ [] _ = Nothing
-transformationApply _ _ _ ([],_) = Nothing
-transformationApply _ _ _ (_,[]) = Nothing
+transformationApply _ _ _ ([], _) = Nothing
+transformationApply _ _ _ (_, []) = Nothing
 transformationApply b f xs (ys, zs) = mmap (substitute b zs) (match b ys xs)
 
 -- Applying a list of patterns until one succeeds
