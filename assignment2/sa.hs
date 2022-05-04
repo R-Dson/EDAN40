@@ -15,10 +15,10 @@ similarityScore :: String -> String -> Int
 similarityScore [] _ = 0
 similarityScore _ [] = 0
 similarityScore (s:ss) (t:ts)
+  | (s == '-') || (t == '-') = scoreSpace + m
   | s == t = scoreMatch + similarityScore ss ts
   | s /= t = scoreMismatch + similarityScore ss ts
-  | (s == '-') || (t == '-') = scoreSpace + m
-  | otherwise = 0
+  | otherwise = m
     where m = max (similarityScore ss (t:ts)) (similarityScore (s:ss) ts)
 
 maximaBy :: Ord b => (a -> b) -> [a] -> [a]
@@ -29,4 +29,6 @@ maximaBy valueFcn xs =
   in [fst r | r <- res]
 
 
-main = print (similarityScore "HASKELL" "PASCA-L") --print(optimalAlignments 1 2 3 "" "")
+main :: IO ()
+--main = print (similarityScore "H A S K E L L" "P A S C A - L")
+main = print (similarityScore "HASKELL" "PASCA-L")
