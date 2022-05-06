@@ -1,7 +1,7 @@
 
-scoreMatch = 1
+scoreMatch = 0
 scoreMismatch = -1
-scoreSpace = -2
+scoreSpace = -1
 
 string1 = "writers"
 string2 = "vintner"
@@ -10,16 +10,30 @@ string2 = "vintner"
 optimalAlignments :: Int -> Int -> Int -> String -> String -> [AlignmentType]
 optimalAlignments a b c s t = [("","")]
 
+-- given hints
+--score(x,'-') = score('-',y) = scoreSpace
+--score(x,y) = scoreMatch, if x == y
+--             scoreMismatch, if x /= y
+
+
+--sim((x:xs),(y:ys)) = max {sim(xs,ys) + score(x,y),
+--                          sim(xs,(y:ys)) + score(x,'-'),
+--                          sim((x:xs),ys) + score('-',y)}
+
+-- in code we get score and a)
+score x '-' = scoreSpace
+score '-' y = scoreSpace
+score x y
+    | x == y    = scoreMatch
+    | otherwise = scoreMismatch
+
 -- a)
 similarityScore :: String -> String -> Int
-similarityScore [] _ = 0
-similarityScore _ [] = 0
-similarityScore (s:ss) (t:ts)
-  | (s == '-') || (t == '-') = scoreSpace + m
-  | s == t = scoreMatch + similarityScore ss ts
-  | s /= t = scoreMismatch + similarityScore ss ts
-  | otherwise = m
-    where m = max (similarityScore ss (t:ts)) (similarityScore (s:ss) ts)
+similarityScore [] s = (length s) * scoreSpace;
+similarityScore s [] = (length s) * scoreSpace;
+similarityScore (s:ss) (t:ts) = maximum [score s t + similarityScore ss ts, 
+                                         score '-' t + similarityScore (s:ss) ts, 
+                                         score s '-' + similarityScore ss (t:ts)]
 
 -- b)
 -- appends h1 to the first element in the pair of each element in aList
@@ -41,17 +55,14 @@ maximaBy valueFcn xs =
 type AlignmentType = (String, String)
 
 optAlignments :: String -> String -> [AlignmentType]
-optAlignments [] s = [([], s)]
-optAlignments s [] = [(s, [])]
-
-optAlignments (s:ss) (t:ts) = maximaBy (uncurry similarityScore) l
+optAlignments [] [] = [([],[])]
+optAlignments [] (s:ss) = attachHeads '-' s $ optAlignments [] ss
+optAlignments (s:ss) [] = attachHeads s '-' $ optAlignments ss []
+optAlignments (s:ss) (t:ts) = maximaBy (uncurry similarityScore) $ concat [v, w, u]
   where
     v = attachHeads s t $ optAlignments ss ts
-    w = attachHeads '-' t $ optAlignments (s:ss) ts
     u = attachHeads s '-' $ optAlignments ss (t:ts)
-    l = concat [v, w, u]
-
-
+    w = attachHeads '-' t $ optAlignments (s:ss) ts
 
 main :: IO ()
 --main = print (similarityScore "H A S K E L L" "P A S C A - L")
