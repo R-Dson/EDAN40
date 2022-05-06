@@ -3,9 +3,11 @@ scoreMatch = 0
 scoreMismatch = -1
 scoreSpace = -1
 
-string1 = "writers"
-string2 = "vintner"
+string1 = "writer"
+string2 = "vintne"
 
+string3 = "write"
+string4 = "vintn"
 
 optimalAlignments :: Int -> Int -> Int -> String -> String -> [AlignmentType]
 optimalAlignments a b c s t = [("","")]
@@ -31,8 +33,8 @@ score x y
 similarityScore :: String -> String -> Int
 similarityScore [] s = (length s) * scoreSpace;
 similarityScore s [] = (length s) * scoreSpace;
-similarityScore (s:ss) (t:ts) = maximum [score s t + similarityScore ss ts, 
-                                         score '-' t + similarityScore (s:ss) ts, 
+similarityScore (s:ss) (t:ts) = maximum [score s t + similarityScore ss ts,
+                                         score '-' t + similarityScore (s:ss) ts,
                                          score s '-' + similarityScore ss (t:ts)]
 
 -- b)
@@ -63,6 +65,16 @@ optAlignments (s:ss) (t:ts) = maximaBy (uncurry similarityScore) $ concat [v, w,
     v = attachHeads s t $ optAlignments ss ts
     u = attachHeads s '-' $ optAlignments ss (t:ts)
     w = attachHeads '-' t $ optAlignments (s:ss) ts
+
+-- e)
+outputOptAlignments :: String -> String -> IO ()
+outputOptAlignments string1 string2 = 
+  let ans = optAlignments string1 string2
+      m = map formater ans
+  in mapM_ putStrLn m
+
+formater :: (String, String) -> String
+formater (s, t) = s ++ " : " ++ t
 
 main :: IO ()
 --main = print (similarityScore "H A S K E L L" "P A S C A - L")
