@@ -37,17 +37,16 @@ score x y
 
 -- a)
 similarityScore :: String -> String -> Int
---similarityScore [] [] = 0;
-similarityScore ss [] = (length ss) * scoreSpace;
-similarityScore [] ss = (length ss) * scoreSpace;
+similarityScore ss [] = (length ss) * scoreSpace 
+similarityScore [] ss = (length ss) * scoreSpace
 similarityScore (s:ss) (t:ts)
   | (s == '-') || (t == '-') = scoreSpace + m
-  | s == t = scoreMatch + similarityScore ss ts
-  | s /= t = scoreMismatch + similarityScore ss ts
-  | otherwise = m
+  | s == t = scoreMatch + m
+  | otherwise = scoreMismatch + similarityScore ss ts
     where m = maximum [similarityScore ss ts, similarityScore ss (t:ts), similarityScore (s:ss) ts]
 
 -- Getting more than 3 results from "outputOptAlignments string1 string2" with this one..
+-- I think I misunderstood it when i wrote this
 --similarityScore [] ss = (length ss) * scoreSpace;
 --similarityScore ss [] = (length ss) * scoreSpace;
 --similarityScore (s:ss) (t:ts) = maximum [similarityScore ss ts + score s t,
