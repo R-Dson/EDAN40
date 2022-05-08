@@ -1,13 +1,18 @@
 
+-- Writen by:
+-- Robin Baki Davidsson (ro5226ba-s)
+-- Verneri Sirva (ve7517si-s)
+-- (Group 33 on canvas)
+
 scoreMatch = 0
 scoreMismatch = -1
 scoreSpace = -1
 
-string1 = "writer"
-string2 = "vintne"
+string1 = "writers"
+string2 = "vintner"
 
-string3 = "write"
-string4 = "vintn"
+string3 = "writ"
+string4 = "vint"
 
 optimalAlignments :: Int -> Int -> Int -> String -> String -> [AlignmentType]
 optimalAlignments a b c s t = [("","")]
@@ -23,6 +28,7 @@ optimalAlignments a b c s t = [("","")]
 --                          sim((x:xs),ys) + score('-',y)}
 
 -- in code we get score and a)
+score :: Char -> Char -> Int
 score x '-' = scoreSpace
 score '-' y = scoreSpace
 score x y
@@ -31,11 +37,22 @@ score x y
 
 -- a)
 similarityScore :: String -> String -> Int
-similarityScore [] s = (length s) * scoreSpace;
-similarityScore s [] = (length s) * scoreSpace;
-similarityScore (s:ss) (t:ts) = maximum [score s t + similarityScore ss ts,
-                                         score '-' t + similarityScore (s:ss) ts,
-                                         score s '-' + similarityScore ss (t:ts)]
+--similarityScore [] [] = 0;
+similarityScore ss [] = (length ss) * scoreSpace;
+similarityScore [] ss = (length ss) * scoreSpace;
+similarityScore (s:ss) (t:ts)
+  | (s == '-') || (t == '-') = scoreSpace + m
+  | s == t = scoreMatch + similarityScore ss ts
+  | s /= t = scoreMismatch + similarityScore ss ts
+  | otherwise = m
+    where m = maximum [similarityScore ss ts, similarityScore ss (t:ts), similarityScore (s:ss) ts]
+
+-- Getting more than 3 results from "outputOptAlignments string1 string2" with this one..
+--similarityScore [] ss = (length ss) * scoreSpace;
+--similarityScore ss [] = (length ss) * scoreSpace;
+--similarityScore (s:ss) (t:ts) = maximum [similarityScore ss ts + score s t,
+--                                         similarityScore (s:ss) ts + score '-' t,
+--                                         similarityScore ss (t:ts) + score s '-']
 
 -- b)
 -- appends h1 to the first element in the pair of each element in aList
@@ -68,9 +85,9 @@ optAlignments (s:ss) (t:ts) = maximaBy (uncurry similarityScore) $ concat [v, w,
 
 -- e)
 outputOptAlignments :: String -> String -> IO ()
-outputOptAlignments string1 string2 = 
+outputOptAlignments string1 string2 =
   let ans = optAlignments string1 string2
-      m = map formater ans
+      m = ("There are " ++ show(length ans) ++ " optimal alignments") : map formater ans
   in mapM_ putStrLn m
 
 formater :: (String, String) -> String
