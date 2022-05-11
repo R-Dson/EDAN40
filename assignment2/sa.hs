@@ -27,7 +27,7 @@
   the dynamic programming problem with tables and such, we felt
   that we are more proud of the code writen for similarityScore
   and optAlignments. Also because we just extended these functions
-  tho make use of the code structure of mcsLength. 
+  to make use of the code structure of mcsLength. 
 -}
 
 scoreMatch = 0
