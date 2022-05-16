@@ -1,4 +1,4 @@
-module Parser(module CoreParser) where
+module Parser(module CoreParser, require, (-#), (#-), spaces, (>->), accept, (#)) where
 import Prelude hiding (return, fail)
 import CoreParser
 import Data.Char
@@ -37,7 +37,9 @@ err :: String -> Parser a
 err message cs = error (message++" near "++cs++"\n")
 
 token :: Parser a -> Parser a
-token m = m #- iter space
+token m = m #- space
 
 accept :: String -> Parser String
 accept w = token (chars (length w) ? (==w))
+
+-- word

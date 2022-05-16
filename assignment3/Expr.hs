@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Expr(Expr, T, parse, fromString, value, toString) where
 import Prelude hiding (return, fail)
 import Parser
@@ -22,3 +21,7 @@ value (Mul x y) dictionary = (value x dictionary) * (value y dictionary)
 value (Div x y) dictionary = case value y dictionary of
     0 -> error ""
     _ -> div (value x dictionary) (value y dictionary)
+
+-- confused, what to do...
+--instance Parse Expr where
+--    parse = expr
