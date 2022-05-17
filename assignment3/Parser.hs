@@ -1,4 +1,4 @@
-module Parser(module CoreParser, require, (-#), (#-), spaces, (>->), accept, (#), word, lit, number, iter) where
+module Parser(module CoreParser, require, (-#), (#-), spaces, (>->), accept, (#), word, lit, number, iter, err) where
 import Prelude hiding (return, fail)
 import CoreParser
 import Data.Char
@@ -22,11 +22,11 @@ spaces = iter space
 space :: Parser Char
 space = char ? isSpace
 
-(#-) :: Parser a -> Parser b -> Parser a
-m #- n = m # n >-> fst
-
 (-#) :: Parser a -> Parser b -> Parser b
 m -# n = m # n >-> snd
+
+(#-) :: Parser a -> Parser b -> Parser a
+m #- n = m # n >-> fst
 
 iter :: Parser a -> Parser [a]
 iter m = m # iter m >-> cons ! return []
@@ -42,12 +42,14 @@ digit = char ? isDigit
 digitVal :: Parser Integer
 digitVal = digit >-> digitToInt >-> fromIntegral
 
-bldNumber :: Int -> Int -> Int
-bldNumber n d = 10*n+d
+--bldNumber :: Int -> Int -> Int
+--bldNumber n d = 10*n+d
+
 -- had some issues with the type when using bldNumber but this seems to work
 number' :: Integer -> Parser Integer
 number' n = digitVal #> (\ d -> number' (10*n+d))
           ! return n
+
 number :: Parser Integer
 number = token (digitVal #> number')
 
