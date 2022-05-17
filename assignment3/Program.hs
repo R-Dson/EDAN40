@@ -8,6 +8,7 @@ newtype T = Program [Statement.T]
 
 instance Parse T where
   parse = error "Program.parse not implemented"
-  toString = error "Program.toString not implemented"
+  -- Maybe we should have stmt or stmts instead of p? 
+  toString (Program p) = error "Program.toString not implemented"
 
-exec = error "Program.exec not implemented"
+exec (Program p) = error "Program.exec not implemented"
