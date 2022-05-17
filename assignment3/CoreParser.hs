@@ -44,15 +44,15 @@ fail cs = Nothing
 -- Define the required parser operators
 (!) :: Parser a -> Parser a -> Parser a
 (m ! n) cs = case m cs of
-             Nothing -> n cs 
-             mcs -> mcs
+    Nothing -> n cs 
+    mcs -> mcs
 
 
 (?) :: Parser a -> (a -> Bool) -> Parser a
 (m ? p) cs = 
     case m cs of
-    Nothing -> Nothing
-    Just(r, s) -> if p r then Just(r, s) else Nothing
+        Nothing -> Nothing
+        Just(r, s) -> if p r then Just(r, s) else Nothing
 
 (#) :: Parser a -> Parser b -> Parser (a, b)
 (m # n) cs = 
@@ -60,17 +60,17 @@ fail cs = Nothing
     Nothing -> Nothing
     Just(a, cs') -> 
         case n cs' of
-        Nothing -> Nothing
-        Just(b, cs'') -> Just((a, b), cs'')
+            Nothing -> Nothing
+            Just(b, cs'') -> Just((a, b), cs'')
 
 (>->) :: Parser a -> (a -> b) -> Parser b
 (m >-> b) cs = 
     case m cs of
-    Just(a, cs') -> Just(b a, cs')
-    Nothing -> Nothing
+        Just (a, cs') -> Just (b a, cs')
+        Nothing -> Nothing
 
 (#>) :: Parser a -> (a -> Parser b) -> Parser b 
 (p #> k) cs = 
     case p cs of
-    Nothing -> Nothing
-    Just(a, cs') -> k a cs'
+        Nothing -> Nothing
+        Just (a, cs') -> k a cs'
