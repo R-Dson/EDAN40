@@ -49,14 +49,17 @@ instance Parse Statement where
 
 exec :: [Statement.T] -> Dictionary.T String Integer -> [Integer] -> [Integer]
 exec [] _ _ = []
-exec (Assignment s e:es) dict i = []
+exec (Assignment s e:es) dict i = exec es (Dictionary.insert (s, Expr.value e dict) dict) i
 exec (Skip : sk) dict i = exec sk dict i
-exec (Begin s:stmts) dict i = []
+exec (Begin s:stmts) dict i = exec (s ++ stmts) dict i
 exec (If e thenStmts elseStmts:stmts) dict i = 
     if Expr.value e dict > 0
     then exec (thenStmts : stmts) dict i
     else exec (elseStmts : stmts) dict i
-exec (While e s:stmts) dict i = []
-exec (Read s:ss) dict i = []
-exec (Write e:es) dict i = []
-exec (Comment c:cs) d i = exec cs d i -- handled as white space
+exec (While e s:stmts) dict i = 
+    if Expr.value e dict > 0
+    then exec (s : (While e s) : stmts) dict i
+    else exec stmts dict i
+exec (Read s:ss) dict i = exec ss (Dictionary.insert (s, head i) dict) (tail i)
+exec (Write e:es) dict i = Expr.value e dict : exec es dict i
+exec (Comment c:cs) dict i = exec cs dict i -- handled as white space
