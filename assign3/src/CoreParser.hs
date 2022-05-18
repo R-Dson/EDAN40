@@ -25,7 +25,6 @@ class Parse a where
                Just(s, cs) -> error ("garbage '"++cs++"'")
                Nothing -> error "Nothing"
     toString :: a -> String
-    toString a = ""
 type Parser a = String -> Maybe (a, String)
 
 -- Define three elementary parsers

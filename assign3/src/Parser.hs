@@ -1,4 +1,4 @@
-module Parser(module CoreParser, require, (-#), (#-), spaces, (>->), accept, (#), word, lit, number, iter, err, letter) where
+module Parser(module CoreParser, require, (-#), (#-), spaces, accept, word, lit, number, iter, err, letter, chars) where
 import Prelude hiding (return, fail)
 import CoreParser
 import Data.Char
@@ -17,10 +17,7 @@ require :: String -> Parser String
 require w = accept w ! err ("error " ++ w) 
 
 spaces :: Parser String
-spaces = iter space
-
-space :: Parser Char
-space = char ? isSpace
+spaces = iter $ char ? isSpace
 
 (-#) :: Parser a -> Parser b -> Parser b
 m -# n = m # n >-> snd
@@ -60,10 +57,10 @@ letters :: Parser String
 letters = iter letter
 
 token :: Parser a -> Parser a
-token m = m #- space
+token m = m #- spaces
 
 word :: Parser String
-word = token letters
+word = token (letter # iter letter >-> cons)
 
 lit :: Char -> Parser Char
 lit c = token char ? (==c)
