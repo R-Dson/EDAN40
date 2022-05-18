@@ -42,9 +42,10 @@ fail cs = Nothing
 
 -- Define the required parser operators
 (!) :: Parser a -> Parser a -> Parser a
-(m ! n) cs = case m cs of
-    Nothing -> n cs 
-    mcs -> mcs
+(m ! n) cs = 
+    case m cs of
+        Nothing -> n cs 
+        mcs -> mcs
 
 
 (?) :: Parser a -> (a -> Bool) -> Parser a

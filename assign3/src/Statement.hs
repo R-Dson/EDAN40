@@ -11,7 +11,7 @@ data Statement = Skip
     | Begin [Statement]
     | If Expr.T Statement Statement
     | While Expr.T Statement
-    | Write Expr.T
+    | Write Expr.T -- assign
     | Read String -- variable name
     | Comment String
     deriving Show
@@ -22,7 +22,7 @@ begin = accept "begin" -# iter parse #- require "end" >-> buildBegin -- finds "b
 skip = accept "skip" # require ";" >-> buildSkip -- finds "skip" and the ";"
 ifCase = accept "if" -# Expr.parse # require "then" -# parse # require "else" -# parse >-> buildIf
 whileCase = accept "while" -# Expr.parse #- require "do" # parse >-> buildWhile
-commentCase = accept "--" -# word #- require "\n" >-> buildComment
+commentCase = accept "--" -# cmnt #- require "\n" >-> buildComment
 write = accept "write" -# Expr.parse #- require ";" >-> buildWrite
 reader = accept "read" -# word #- require ";" >-> buildRead
 
@@ -83,14 +83,14 @@ exec (Comment c:cs) dict i =
     exec cs dict i -- handled as white space
 
 shw :: Statement.T -> String
-shw (Assignment v e) = "\n" ++ v ++ " := " ++ (Expr.toString e) ++ ";"
-shw Skip = "\nskip;"
-shw (Read v) = "\nRead " ++ v ++ ";"
-shw (Write e) = "\nWrite " ++ Expr.toString e ++ ";"
-shw (If e s es) = "\nIf " ++ Expr.toString e ++ " then " ++ shw s ++ " else " ++ shw es
-shw (While e s) = "\nWhile " ++ Expr.toString e ++ " do " ++ shw s
-shw (Begin s) = "\nBegin " ++ concatMap shw s ++ " end"
-
+shw (Assignment v e) = "" ++ v ++ " := " ++ (Expr.toString e) ++ ";\n"
+shw Skip = "skip;\n"
+shw (Read v) = "Read " ++ v ++ ";\n"
+shw (Write e) = "Write " ++ Expr.toString e ++ "\n"
+shw (If e s es) = "If " ++ Expr.toString e ++ " then " ++ shw s ++ " else " ++ shw es
+shw (While e s) = "While " ++ Expr.toString e ++ " do " ++ shw s ++ "\n"
+shw (Begin s) = "Begin " ++ concatMap shw s ++ " end"
+shw (Comment c) = "-- " ++ c ++ "\n"
 
 instance Parse Statement where
     parse = assignment ! begin ! ifCase ! commentCase ! whileCase ! skip ! reader ! write

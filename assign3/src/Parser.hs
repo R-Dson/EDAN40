@@ -1,4 +1,4 @@
-module Parser(module CoreParser, require, (-#), (#-), spaces, accept, word, lit, number, iter, err, letter, chars) where
+module Parser(module CoreParser, require, (-#), (#-), spaces, accept, word, lit, number, iter, err, letter, chars, cmnt) where
 import Prelude hiding (return, fail)
 import CoreParser
 import Data.Char
@@ -64,3 +64,5 @@ word = token (letter # iter letter >-> cons)
 
 lit :: Char -> Parser Char
 lit c = token char ? (==c)
+
+cmnt = iter $ char ? (/= '\n')

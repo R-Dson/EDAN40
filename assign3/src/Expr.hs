@@ -29,18 +29,17 @@ import qualified Dictionary
 
 type T = Expr
 
-data Expr = Num Integer | Var String | Add Expr Expr 
+data Expr = Num Integer | Var String | Add Expr Expr
        | Sub Expr Expr | Mul Expr Expr | Div Expr Expr | Exp Expr Expr
          deriving Show
 
-var, num, factor, term, expr :: Parser Expr
-
+var, num, factor, term, expr, expf :: Parser Expr
 
 var = word >-> Var
-num = number >-> Num 
+num = number >-> Num
 
 value :: Expr -> Dictionary.T String Integer -> Integer
-value (Var e) dictionary = 
+value (Var e) dictionary =
     case Dictionary.lookup e dictionary of
         Just v -> v
         Nothing -> error ("undefined variable " ++ e)
@@ -53,26 +52,28 @@ value (Div x y) dictionary = case value y dictionary of
     _ -> div (value x dictionary) (value y dictionary)
 value (Exp x y) dictionary = (value x dictionary) ^ (value y dictionary)
 
-mulOp = lit '*'>-> (\_ -> Mul) ! lit '/' >-> (\_ -> Div)
-addOp = lit '+'>-> (\_ -> Add) ! lit '-' >-> (\_ -> Sub)
-expOp = lit '^' >-> (\_ -> Exp)
+mulOp = lit '*'>-> const Mul ! lit '/' >-> const Div
+
+addOp = lit '+'>-> const Add ! lit '-' >-> const Sub
+
+expOp = lit '^' >-> const Exp
 
 bldOp :: Expr -> (Expr -> Expr -> Expr, Expr) -> Expr
-bldOp e (oper,e') = oper e e'
+bldOp e (oper, e') = oper e e'
 
 factor = num !
          var !
          lit '(' -# expr #- lit ')' !
          err "illegal factor"
 
-term' :: Expr -> Parser Expr
-term' e = mulOp # factor >-> bldOp e #> term' ! return e
+exp', term', expr' :: Expr -> Parser Expr
+exp' e = expOp # factor >-> bldOp e #> exp' ! return e
+expf = factor #> exp'
 
-term = factor #> term'
+term' e = mulOp # expf >-> bldOp e #> term' ! return e
+term = expf #> term'
 
-expr' :: Expr -> Parser Expr
 expr' e = addOp # term >-> bldOp e #> expr' ! return e
-
 expr = term #> expr'
 
 parens cond str = if cond then "(" ++ str ++ ")" else str
@@ -84,7 +85,7 @@ shw prec (Add t u) = parens (prec>5) (shw 5 t ++ "+" ++ shw 5 u)
 shw prec (Sub t u) = parens (prec>5) (shw 5 t ++ "-" ++ shw 6 u)
 shw prec (Mul t u) = parens (prec>6) (shw 6 t ++ "*" ++ shw 6 u)
 shw prec (Div t u) = parens (prec>6) (shw 6 t ++ "/" ++ shw 7 u)
-shw prec (Exp t u) = parens (prec>7) (shw 7 t ++ "^" ++ shw 7 u)
+shw prec (Exp t u) = parens (prec>7) (shw 7 t ++ "^" ++ shw 8 u)
 
 instance Parse Expr where
     parse = expr
