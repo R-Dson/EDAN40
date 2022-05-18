@@ -20,7 +20,7 @@ data Statement = Skip
 assignment = word #- accept ":=" # Expr.parse #- require ";" >-> buildAss -- 
 begin = accept "begin" -# iter parse #- require "end" >-> buildBegin -- finds "begin", parse until "end" to get final Statement
 skip = accept "skip" # require ";" >-> buildSkip -- finds "skip" and the ";"
-ifCase = accept "if" -# Expr.parse # require "then" -# parse # require "else" -# parse >-> buildIf -- NOT SURE WHY ITS BROKEN
+ifCase = accept "if" -# Expr.parse # require "then" -# parse # require "else" -# parse >-> buildIf
 whileCase = accept "while" -# Expr.parse #- require "do" # parse >-> buildWhile
 commentCase = accept "--" -# word #- require "\n" >-> buildComment
 write = accept "write" -# Expr.parse #- require ";" >-> buildWrite
@@ -85,8 +85,8 @@ exec (Comment c:cs) dict i =
 shw :: Statement.T -> String
 shw (Assignment v e) = "\n" ++ v ++ " := " ++ (Expr.toString e) ++ ";"
 shw Skip = "\nskip;"
-shw (Read v) = "\nRead " ++ v
-shw (Write e) = "\nWrite " ++ Expr.toString e
+shw (Read v) = "\nRead " ++ v ++ ";"
+shw (Write e) = "\nWrite " ++ Expr.toString e ++ ";"
 shw (If e s es) = "\nIf " ++ Expr.toString e ++ " then " ++ shw s ++ " else " ++ shw es
 shw (While e s) = "\nWhile " ++ Expr.toString e ++ " do " ++ shw s
 shw (Begin s) = "\nBegin " ++ concatMap shw s ++ " end"

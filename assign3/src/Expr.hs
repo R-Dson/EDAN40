@@ -30,7 +30,7 @@ import qualified Dictionary
 type T = Expr
 
 data Expr = Num Integer | Var String | Add Expr Expr 
-       | Sub Expr Expr | Mul Expr Expr | Div Expr Expr
+       | Sub Expr Expr | Mul Expr Expr | Div Expr Expr | Exp Expr Expr
          deriving Show
 
 var, num, factor, term, expr :: Parser Expr
@@ -43,17 +43,19 @@ value :: Expr -> Dictionary.T String Integer -> Integer
 value (Var e) dictionary = 
     case Dictionary.lookup e dictionary of
         Just v -> v
-        Nothing -> error ("Not found")
+        Nothing -> error ("undefined variable " ++ e)
 value (Num e) dictionary = e
 value (Add x y) dictionary = (value x dictionary) + (value y dictionary)
 value (Sub x y) dictionary = (value x dictionary) - (value y dictionary)
 value (Mul x y) dictionary = (value x dictionary) * (value y dictionary)
 value (Div x y) dictionary = case value y dictionary of
-    0 -> error ""
+    0 -> error "division by 0"
     _ -> div (value x dictionary) (value y dictionary)
+value (Exp x y) dictionary = (value x dictionary) ^ (value y dictionary)
 
 mulOp = lit '*'>-> (\_ -> Mul) ! lit '/' >-> (\_ -> Div)
 addOp = lit '+'>-> (\_ -> Add) ! lit '-' >-> (\_ -> Sub)
+expOp = lit '^' >-> (\_ -> Exp)
 
 bldOp :: Expr -> (Expr -> Expr -> Expr, Expr) -> Expr
 bldOp e (oper,e') = oper e e'
