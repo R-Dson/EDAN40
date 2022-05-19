@@ -1,4 +1,8 @@
 module Expr(Expr, T, parse, fromString, value, toString) where
+-- Writen by:
+-- Robin Baki Davidsson (ro5226ba-s)
+-- Verneri Sirva (ve7517si-s)
+-- (Group 33 on canvas)
 
 {-
    An expression of type Expr is a representation of an arithmetic expression 
@@ -52,10 +56,13 @@ value (Div x y) dictionary = case value y dictionary of
     _ -> div (value x dictionary) (value y dictionary)
 value (Exp x y) dictionary = (value x dictionary) ^ (value y dictionary)
 
+mulOp :: Parser (Expr -> Expr -> Expr)
 mulOp = lit '*'>-> const Mul ! lit '/' >-> const Div
 
+addOp :: Parser (Expr -> Expr -> Expr)
 addOp = lit '+'>-> const Add ! lit '-' >-> const Sub
 
+expOp :: Parser (Expr -> Expr -> Expr)
 expOp = lit '^' >-> const Exp
 
 bldOp :: Expr -> (Expr -> Expr -> Expr, Expr) -> Expr
@@ -68,7 +75,7 @@ factor = num !
 
 exp', term', expr' :: Expr -> Parser Expr
 exp' e = expOp # factor >-> bldOp e #> exp' ! return e
-expf = factor #> exp'
+expf = factor #> exp' -- changed priority
 
 term' e = mulOp # expf >-> bldOp e #> term' ! return e
 term = expf #> term'

@@ -1,3 +1,8 @@
+-- Writen by:
+-- Robin Baki Davidsson (ro5226ba-s)
+-- Verneri Sirva (ve7517si-s)
+-- (Group 33 on canvas)
+
 module Program(T, parse, fromString, toString, exec) where
 import Parser hiding (T)
 import qualified Statement

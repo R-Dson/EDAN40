@@ -1,3 +1,8 @@
+-- Writen by:
+-- Robin Baki Davidsson (ro5226ba-s)
+-- Verneri Sirva (ve7517si-s)
+-- (Group 33 on canvas)
+
 module Statement (Statement.T, parse, exec, toString) where
 
 import Parser hiding (T)
@@ -83,13 +88,13 @@ exec (Comment c:cs) dict i =
     exec cs dict i -- handled as white space
 
 shw :: Statement.T -> String
-shw (Assignment v e) = "" ++ v ++ " := " ++ (Expr.toString e) ++ ";\n"
+shw (Assignment v e) = v ++ " := " ++ (Expr.toString e) ++ ";\n"
 shw Skip = "skip;\n"
-shw (Read v) = "Read " ++ v ++ ";\n"
-shw (Write e) = "Write " ++ Expr.toString e ++ "\n"
-shw (If e s es) = "If " ++ Expr.toString e ++ " then " ++ shw s ++ " else " ++ shw es
-shw (While e s) = "While " ++ Expr.toString e ++ " do " ++ shw s ++ "\n"
-shw (Begin s) = "Begin " ++ concatMap shw s ++ " end"
+shw (Read v) = "read " ++ v ++ ";\n"
+shw (Write e) = "write " ++ Expr.toString e ++ "\n"
+shw (If e s es) = "if " ++ Expr.toString e ++ "\n then " ++ shw s ++ " else " ++ shw es
+shw (While e s) = "while " ++ Expr.toString e ++ " do \n " ++ shw s ++ "\n"
+shw (Begin s) = "begin\n " ++ concatMap shw s ++ " end"
 shw (Comment c) = "-- " ++ c ++ "\n"
 
 instance Parse Statement where

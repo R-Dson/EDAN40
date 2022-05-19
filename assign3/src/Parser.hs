@@ -1,3 +1,8 @@
+-- Writen by:
+-- Robin Baki Davidsson (ro5226ba-s)
+-- Verneri Sirva (ve7517si-s)
+-- (Group 33 on canvas)
+
 module Parser(module CoreParser, require, (-#), (#-), spaces, accept, word, lit, number, iter, err, letter, chars, cmnt) where
 import Prelude hiding (return, fail)
 import CoreParser

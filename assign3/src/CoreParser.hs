@@ -1,3 +1,9 @@
+-- Writen by:
+-- Robin Baki Davidsson (ro5226ba-s)
+-- Verneri Sirva (ve7517si-s)
+-- (Group 33 on canvas)
+
+
 -- CoreParser.hs
 -- defines the Parser type and implements the three elementary parsers, char, return and fail, and the basic parser operators #, !, ?, #>, and >->, described in Lennart Andersson's Parsing with Haskell.
 
