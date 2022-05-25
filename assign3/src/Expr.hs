@@ -74,7 +74,7 @@ factor = num !
          err "illegal factor"
 
 exp', term', expr' :: Expr -> Parser Expr
-exp' e = expOp # factor >-> bldOp e #> exp' ! return e
+exp' e = expOp # expf >-> bldOp e #> exp' ! return e
 expf = factor #> exp' -- changed priority
 
 term' e = mulOp # expf >-> bldOp e #> term' ! return e
