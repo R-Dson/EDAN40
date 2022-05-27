@@ -3,7 +3,7 @@
 -- Verneri Sirva (ve7517si-s)
 -- (Group 33 on canvas)
 
-module Statement (Statement.T, parse, exec, toString) where
+module Statement (Statement.T, parse, exec, toString, fromString) where
 
 import Parser hiding (T)
 import Expr
@@ -91,10 +91,10 @@ shw :: Statement.T -> String
 shw (Assignment v e) = v ++ " := " ++ (Expr.toString e) ++ ";\n"
 shw Skip = "skip;\n"
 shw (Read v) = "read " ++ v ++ ";\n"
-shw (Write e) = "write " ++ Expr.toString e ++ "\n"
+shw (Write e) = "write " ++ Expr.toString e ++ ";\n"
 shw (If e s es) = "if " ++ Expr.toString e ++ "\n then " ++ shw s ++ " else " ++ shw es
 shw (While e s) = "while " ++ Expr.toString e ++ " do \n " ++ shw s ++ "\n"
-shw (Begin s) = "begin\n " ++ concatMap shw s ++ " end"
+shw (Begin s) = "begin\n " ++ concatMap shw s ++ " end\n"
 shw (Comment c) = "-- " ++ c ++ "\n"
 
 instance Parse Statement where
